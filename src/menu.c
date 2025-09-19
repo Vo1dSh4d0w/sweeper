@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "menu.h"
+#include "input_handler.h"
 
 static WINDOW *menu_create(int optc) {
     WINDOW *menu_win;
@@ -15,7 +16,7 @@ static WINDOW *menu_create(int optc) {
     return menu_win;
 }
 
-static WINDOW *menu_reset(WINDOW *menu_win, const char *menu_title, int optc, struct menu_option *optv) {
+static WINDOW *menu_reset(WINDOW *menu_win, const char *menu_title, int optc, const struct menu_option *optv) {
     int i;
 
     box(menu_win, 0, 0);
@@ -30,7 +31,7 @@ static WINDOW *menu_reset(WINDOW *menu_win, const char *menu_title, int optc, st
     return menu_win;
 }
 
-static void menu_select(WINDOW *window, struct menu_option *optv, size_t idx) {
+static void menu_select(WINDOW *window, const struct menu_option *optv, size_t idx) {
     wattron(window, COLOR_PAIR(1));
     mvwprintw(window, 3 + idx, 2, "%-48s", optv[idx].label);
     wattroff(window, COLOR_PAIR(1));
@@ -38,7 +39,7 @@ static void menu_select(WINDOW *window, struct menu_option *optv, size_t idx) {
     wrefresh(window);
 }
 
-int menu_open(const char *menu_title, size_t optc, struct menu_option *optv) {
+int menu_open(const char *menu_title, size_t optc, const struct menu_option *optv) {
     WINDOW *menu_win;
     int ch;
     int current_sel = 0;
@@ -50,9 +51,10 @@ int menu_open(const char *menu_title, size_t optc, struct menu_option *optv) {
     menu_select(menu_win, optv, current_sel);
 
     while ((ch = getch()) != '\n') {
+        handle_kb_interrupt(ch);
         switch (ch) {
             case KEY_UP:
-                current_sel = current_sel > 0 ? (current_sel - 1) % optc : optc - 1;
+                current_sel = current_sel > 0 ? (current_sel - 1): optc - 1;
                 menu_reset(menu_win, menu_title, optc, optv);
                 menu_select(menu_win, optv, current_sel);
                 break;

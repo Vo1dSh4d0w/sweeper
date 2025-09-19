@@ -8,6 +8,7 @@ LDFLAGS+= $(PKG_LDFLAGS)
 
 OBJS=\
 src/color.o \
+src/input_handler.o \
 src/main.o \
 src/menu.o
 

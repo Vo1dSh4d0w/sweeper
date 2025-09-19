@@ -8,6 +8,6 @@ struct menu_option {
     char label[48];
 };
 
-int menu_open(const char *menu_title, size_t optc, struct menu_option* optv);
+int menu_open(const char *menu_title, size_t optc, const struct menu_option* optv);
 
 #endif

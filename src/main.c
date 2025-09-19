@@ -1,23 +1,11 @@
 #include <ncurses.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include "color.h"
 #include "menu.h"
-
-enum main_menu_opts {
-    MM_START,
-    MM_STATS,
-    MM_SETTINGS,
-    MM_QUIT,
-};
+#include "main_menu.h"
 
 int main() {
-    struct menu_option main_menu[] = {
-        {MM_START, "Start"},
-        {MM_STATS, "Statistics"},
-        {MM_SETTINGS, "Settings"},
-        {MM_QUIT, "Quit"}
-    };
-
     initscr();
     noecho();
     raw();
@@ -42,5 +30,5 @@ int main() {
     getch();
     endwin();
 
-    return 0;
+    return EXIT_SUCCESS;
 }
