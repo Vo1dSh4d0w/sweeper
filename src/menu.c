@@ -12,6 +12,7 @@ static WINDOW *menu_create(int optc) {
     starty = (LINES - optc - 4) / 2;
 
     menu_win = newwin(optc + 5, 52, starty, startx);
+    keypad(menu_win, 1);
 
     return menu_win;
 }
@@ -50,7 +51,7 @@ int menu_open(const char *menu_title, size_t optc, const struct menu_option *opt
     menu_reset(menu_win, menu_title, optc, optv);
     menu_select(menu_win, optv, current_sel);
 
-    while ((ch = getch()) != '\n') {
+    while ((ch = wgetch(menu_win)) != '\n') {
         handle_kb_interrupt(ch);
         switch (ch) {
             case KEY_UP:

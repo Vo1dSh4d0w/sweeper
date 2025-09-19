@@ -28,8 +28,9 @@ struct config_val {
     union config_variant value;
 };
 
-char *config_serialize(size_t count, struct config_val *config);
-size_t *config_deserialize(struct config_val *config, char *serialized);
-union config_variant *config_get(struct config_val *config, char id[16]);
+char *config_serialize(const size_t count, const struct config_val *config);
+size_t *config_deserialize(struct config_val *config, const char *serialized);
+const union config_variant *config_get(const size_t count, const struct config_val *config, const char id[16]);
+void config_merge(size_t count, const struct config_def *def, struct config_val *into, const struct config_val *from);
 
 #endif
