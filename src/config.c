@@ -12,17 +12,17 @@ const union config_variant *config_get(const size_t count, const struct config_v
     return NULL;
 }
 
-void config_merge(size_t count, const struct config_def *def, struct config_val *into, const struct config_val *from) {
+void config_merge(size_t count_into, size_t count_from, const struct config_def *def, struct config_val *into, const struct config_val *from) {
     int i;
     struct config_val *copy;
     const union config_variant *to_copy;
 
-    copy = malloc(sizeof(struct config_val) * count);
-    memcpy(copy, into, sizeof(struct config_val) * count);
+    copy = malloc(sizeof(struct config_val) * count_into);
+    memcpy(copy, into, sizeof(struct config_val) * count_into);
 
-    for (i = 0; i < count; i++) {
-        to_copy = config_get(count, from, def[i].id);
-        if (to_copy == NULL) to_copy = config_get(count, copy, def[i].id);
+    for (i = 0; i < count_into; i++) {
+        to_copy = config_get(count_from, from, def[i].id);
+        if (to_copy == NULL) to_copy = config_get(count_into, copy, def[i].id);
         memcpy(into[i].id, def[i].id, sizeof(char) * 16);
         memcpy(&into[i].value, to_copy, sizeof(union config_variant));
     }

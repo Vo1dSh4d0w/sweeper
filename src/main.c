@@ -20,7 +20,7 @@ int main() {
     refresh();
 
     config = malloc(sizeof(struct config_val) * 2);
-    config_merge(2, settings_def, config, settings_default);
+    config_merge(2, 2, settings_def, config, settings_default);
 
     do {
         selection = menu_open("Main Menu", 4, main_menu);
