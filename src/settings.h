@@ -30,4 +30,6 @@ const struct config_val settings_default[] = {
   }
 };
 
+extern struct config_val settings[2];
+
 #endif

@@ -8,9 +8,10 @@
 #include "settings.h"
 #include "config.h"
 
+struct config_val settings[2];
+
 int main() {
     enum main_menu_opts selection;
-    struct config_val *config;
 
     initscr();
     noecho();
@@ -19,8 +20,7 @@ int main() {
     color_init();
     refresh();
 
-    config = malloc(sizeof(struct config_val) * 2);
-    config_merge(2, 2, settings_def, config, settings_default);
+    config_merge(2, 2, settings_def, settings, settings_default);
 
     do {
         selection = menu_open("Main Menu", 4, main_menu);
@@ -34,21 +34,18 @@ int main() {
                 refresh();
                 break;
             case MM_SETTINGS:
-                config_menu_open("Settings", 2, settings_def, config);
+                config_menu_open("Settings", 2, settings_def, settings);
                 clear();
                 refresh();
                 break;
             case MM_QUIT:
                 endwin();
-                free(config);
                 return 0;
         }
     } while (selection != MM_START);
 
     getch();
     endwin();
-
-    free(config);
 
     return EXIT_SUCCESS;
 }
