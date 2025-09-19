@@ -18,6 +18,7 @@ int main() {
     raw();
     keypad(stdscr, 1);
     color_init();
+    set_escdelay(25);
     refresh();
 
     config_merge(2, 2, settings_def, settings, settings_default);

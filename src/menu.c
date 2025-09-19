@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "menu.h"
+#include "color.h"
 #include "input_handler.h"
 
 static WINDOW *menu_create(int optc) {
@@ -33,17 +34,16 @@ static WINDOW *menu_reset(WINDOW *menu_win, const char *menu_title, int optc, co
 }
 
 static void menu_select(WINDOW *window, const struct menu_option *optv, size_t idx) {
-    wattron(window, COLOR_PAIR(1));
+    wattron(window, COLOR_PAIR(COLOR_PAIR_INVERSE));
     mvwprintw(window, 3 + idx, 2, "%-48s", optv[idx].label);
-    wattroff(window, COLOR_PAIR(1));
+    wattroff(window, COLOR_PAIR(COLOR_PAIR_INVERSE));
 
     wrefresh(window);
 }
 
 int menu_open(const char *menu_title, size_t optc, const struct menu_option *optv) {
     WINDOW *menu_win;
-    int ch;
-    int current_sel = 0;
+    int ch, current_sel = 0;
 
     curs_set(0);
 
