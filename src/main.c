@@ -29,19 +29,19 @@ int main() {
         refresh();
 
         switch (selection) {
-            case MM_START:
-            case MM_STATS:
-                printw("Selected %d", selection);
-                refresh();
-                break;
-            case MM_SETTINGS:
-                config_menu_open("Settings", 2, settings_def, settings);
-                clear();
-                refresh();
-                break;
-            case MM_QUIT:
-                endwin();
-                return 0;
+        case MM_START:
+        case MM_STATS:
+            printw("Selected %d", selection);
+            refresh();
+            break;
+        case MM_SETTINGS:
+            config_menu_open("Settings", 2, settings_def, settings);
+            clear();
+            refresh();
+            break;
+        case MM_QUIT:
+            endwin();
+            return 0;
         }
     } while (selection != MM_START);
 
