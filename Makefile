@@ -1,7 +1,7 @@
 PKG_CFLAGS=$(shell pkg-config --cflags ncurses)
 PKG_LDFLAGS=$(shell pkg-config --libs ncurses)
 
-CLFAGS?=-Wall -O2
+CFLAGS?=-Wall -O2
 CFLAGS+= $(PKG_CFLAGS)
 LDFLAGS?=
 LDFLAGS+= $(PKG_LDFLAGS)

@@ -7,6 +7,7 @@
 #include "color.h"
 #include "config.h"
 #include "input_handler.h"
+#include "macros.h"
 
 /**
  * struct config_info : an array of configuration definitions, configuration values and its count grouped together
@@ -117,6 +118,84 @@ static void config_menu_select(WINDOW *menu_win, int selection, const struct con
     wrefresh(menu_win);
 }
 
+static size_t config_menu_read_input(WINDOW *window, const int index, const size_t offset, char *out) {
+    int y, x;
+    chtype input[44];
+    size_t length;
+
+    getyx(window, y, x);
+
+    mvwinchnstr(window, index + 3, 50 + offset, input, 44);
+    for (length = 0; length < 44; length++) {
+        if ((input[length] & A_CHARTEXT) == ' ') {
+            if (out != NULL) {
+                out[length] = '\0';
+            }
+            break;
+        }
+        if (out != NULL) {
+            out[length] = input[length] & A_CHARTEXT;
+        }
+    }
+
+    wmove(window, y, x);
+
+    return length;
+}
+
+static int config_menu_handle_backspace(WINDOW *window) {
+    int y, x;
+    char input[44];
+    size_t length;
+
+    getyx(window, y, x);
+
+    if (x <= 50) {
+        return 0;
+    }
+
+    length = config_menu_read_input(window, y - 3, x - 50, input);
+
+    if (length - x == 0) {
+        return 0;
+    }
+
+    input[length] = ' ';
+    input[length + 1] = '\0';
+
+    mvwprintw(window, y, x - 1, "%s", input);
+    wmove(window, y, x - 1);
+
+    return 1;
+}
+
+static void config_menu_shift_input(WINDOW *window) {
+    int y, x;
+    char input[44];
+
+    getyx(window, y, x);
+
+    if (config_menu_read_input(window, y - 3, x - 50, input)) {
+        mvwprintw(window, y, x + 1, "%s", input);
+    }
+
+    wmove(window, y, x);
+}
+
+static void config_menu_update_input(WINDOW *window, enum config_type cfg_type, union config_variant *value) {
+    int y, x;
+    char input[44];
+
+    getyx(window, y, x);
+
+    discard(x);
+
+    config_menu_read_input(window, y - 3, 0, input);
+    if (cfg_type == CFG_TYPE_NUMBER) {
+        value->number = strtoll(input, NULL, 10);
+    }
+}
+
 /**
  * config_menu_input : handle input in the menu;
  *                     this function will modify the configuration value;
@@ -127,57 +206,21 @@ static void config_menu_select(WINDOW *menu_win, int selection, const struct con
  * @param cfg    : the configuration information
  */
 static void config_menu_input(WINDOW *window, const int sel, const int ch, struct config_info *cfg) {
-    int y, x, i;
-    chtype input[44];
-    char raw_input[44];
-    size_t len;
+    char input[44];
     union config_variant new_value;
 
-    getyx(window, y, x);
-    mvwinchnstr(window, y, 50, input, 44);
-    wmove(window, y, x);
-    for (len = 0; len < 44; len++) {
-        if ((input[len] & A_CHARTEXT) == ' ') break;
-    }
+    config_menu_read_input(window, sel, 0, input);
+
     if (ch == KEY_BACKSPACE) {
-        mvwinchnstr(window, y, x, input, 44);
-        for (i = 0; i < 43; i++) {
-            if ((input[i] & A_CHARTEXT) == ' ') {
-                raw_input[i] = ' ';
-                raw_input[i + 1] = '\0';
-                break;
-            }
-            raw_input[i] = input[i] & A_CHARTEXT;
-        }
-        mvwprintw(window, y, x - 1, "%s", raw_input);
-    } else if (len == x - 50) {
-        waddch(window, ch);
+        config_menu_handle_backspace(window);
     } else {
-        mvwinchnstr(window, y, x, input, 44);
-        for (len = 0; len < 44; len++) {
-            if ((input[len] & A_CHARTEXT) == ' ') {
-                raw_input[len] = '\0';
-                break;
-            }
-            raw_input[len] = input[len] & A_CHARTEXT;
-        }
-        mvwprintw(window, y, x + 1, "%s", raw_input);
-        wmove(window, y, x);
+        config_menu_shift_input(window);
         waddch(window, ch);
     }
-    mvwinchnstr(window, y, 50, input, 44);
-    for (len = 0; len < 44; len++) {
-        if ((input[len] & A_CHARTEXT) == ' ') {
-            raw_input[len] = '\0';
-            break;
-        }
-        raw_input[len] = input[len] & A_CHARTEXT;
-    }
-    if (cfg->def[sel].type == CFG_TYPE_NUMBER) {
-        new_value.number = strtoll(raw_input, NULL, 10);
-    }
+
+    config_menu_update_input(window, cfg->def[sel].type, &new_value);
     config_set(cfg->count, cfg->val, cfg->def[sel].id, new_value);
-    wmove(window, y, x + (ch == KEY_BACKSPACE ? -1 : 1));
+
     wrefresh(window);
 }
 

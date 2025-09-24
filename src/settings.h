@@ -22,11 +22,15 @@ const struct config_def settings_def[] = {
 const struct config_val settings_default[] = {
   {
       .id = SETTINGS_WIDTH,
-      .value = 10,
+      .value = {
+          .number = 10
+      },
   },
   {
       .id = SETTINGS_HEIGHT,
-      .value = 10,
+      .value = {
+          .number = 10
+      },
   }
 };
 

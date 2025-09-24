@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-const union config_variant *config_get(const size_t count, const struct config_val *config, const char *id) {
+const union config_variant *config_get(const size_t count, const struct config_val *config, const char id[16]) {
     int i;
 
     // iterate through the configuration array until the value with the given id is found
@@ -14,7 +14,7 @@ const union config_variant *config_get(const size_t count, const struct config_v
     return NULL;
 }
 
-void config_set(const size_t count, struct config_val *config, const char *id, union config_variant value) {
+void config_set(const size_t count, struct config_val *config, const char id[16], union config_variant value) {
     int i;
 
     // iterate through the configuration array until the value with the given id is found
