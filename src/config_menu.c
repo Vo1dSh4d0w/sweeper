@@ -92,26 +92,30 @@ static void config_menu_reset(WINDOW *menu_win, const char *menu_title, const st
 }
 
 /**
- * config_menu_select : highlight the selected configuration option or control button;
- *                      this function will call refresh on the window
- * @param menu_win  : the window to highlight the selection on
- * @param selection : the index of the selection to hightlight;
+ * config_menu_print_control : print the selected configuration option or control button;
+ *                             this function will call refresh on the window
+ * @param menu_win  : the window to print the control on
+ * @param control   : the index of the selection to print;
  *                    values between 0 and count - 1 will be treated as selections of values;
  *                    a value of count will be treated as selection of <OK> control button
  *                    a value of count + 1 will be treated as selection of <Cancel> control button
- * @param cfg        : the configuration information
+ * @param select    : whether or not to highlight the control
+ * @param cfg       : the configuration information
  */
-static void config_menu_select(WINDOW *menu_win, int selection, const struct config_info *cfg) {
-    wattron(menu_win, COLOR_PAIR(COLOR_PAIR_INVERSE));
-    if (selection == cfg->count) {
+static void config_menu_print_control(WINDOW *menu_win, int control, int select, const struct config_info *cfg) {
+    if (select) {
+        wattron(menu_win, COLOR_PAIR(COLOR_PAIR_INVERSE));
+    }
+
+    if (control == cfg->count) {
         curs_set(0);
         mvwprintw(menu_win, cfg->count + 4, 22, "<OK>");
-    } else if (selection == cfg->count + 1) {
+    } else if (control == cfg->count + 1) {
         curs_set(0);
         mvwprintw(menu_win, cfg->count + 4, 68, "<Cancel>");
     } else {
         curs_set(1);
-        config_menu_print_config(menu_win, selection + 3, 50, cfg->def[selection].type, &cfg->val[selection].value);
+        config_menu_print_config(menu_win, control + 3, 50, cfg->def[control].type, &cfg->val[control].value);
     }
     wattroff(menu_win, COLOR_PAIR(COLOR_PAIR_INVERSE));
 
@@ -238,31 +242,31 @@ void config_menu_open(const char *menu_title, size_t count, const struct config_
 
     menu_win = config_menu_create(count);
     config_menu_reset(menu_win, menu_title, &cfg);
-    config_menu_select(menu_win, current_sel, &cfg);
+    config_menu_print_control(menu_win, current_sel, 1, &cfg);
 
     while ((ch = wgetch(menu_win)) != '\x1b') {
         handle_kb_interrupt(ch);
 
         switch (ch) {
         case KEY_UP:
+            config_menu_print_control(menu_win, current_sel, 0, &cfg);
             current_sel = current_sel > 0 ? (current_sel - 1): count + 1;
-            config_menu_reset(menu_win, menu_title, &cfg);
-            config_menu_select(menu_win, current_sel, &cfg);
+            config_menu_print_control(menu_win, current_sel, 1, &cfg);
             break;
         case KEY_DOWN:
+            config_menu_print_control(menu_win, current_sel, 0, &cfg);
             current_sel = (current_sel + 1) % (count + 2);
-            config_menu_reset(menu_win, menu_title, &cfg);
-            config_menu_select(menu_win, current_sel, &cfg);
+            config_menu_print_control(menu_win, current_sel, 1, &cfg);
             break;
         case KEY_LEFT:
             if (current_sel == count) {
+                config_menu_print_control(menu_win, current_sel, 0, &cfg);
                 current_sel++;
-                config_menu_reset(menu_win, menu_title, &cfg);
-                config_menu_select(menu_win, current_sel, &cfg);
+                config_menu_print_control(menu_win, current_sel, 1, &cfg);
             } else if (current_sel == count + 1) {
+                config_menu_print_control(menu_win, current_sel, 0, &cfg);
                 current_sel--;
-                config_menu_reset(menu_win, menu_title, &cfg);
-                config_menu_select(menu_win, current_sel, &cfg);
+                config_menu_print_control(menu_win, current_sel, 1, &cfg);
             } else {
                 getyx(menu_win, y, x);
                 if (x > 50) {
@@ -272,13 +276,13 @@ void config_menu_open(const char *menu_title, size_t count, const struct config_
             break;
         case KEY_RIGHT:
             if (current_sel == count) {
+                config_menu_print_control(menu_win, current_sel, 0, &cfg);
                 current_sel++;
-                config_menu_reset(menu_win, menu_title, &cfg);
-                config_menu_select(menu_win, current_sel, &cfg);
+                config_menu_print_control(menu_win, current_sel, 1, &cfg);
             } else if (current_sel == count + 1) {
+                config_menu_print_control(menu_win, current_sel, 0, &cfg);
                 current_sel--;
-                config_menu_reset(menu_win, menu_title, &cfg);
-                config_menu_select(menu_win, current_sel, &cfg);
+                config_menu_print_control(menu_win, current_sel, 1, &cfg);
             } else {
                 getyx(menu_win, y, x);
                 if (x < 90) {
@@ -301,7 +305,7 @@ void config_menu_open(const char *menu_title, size_t count, const struct config_
         case KEY_DL:
                 config_menu_input(menu_win, current_sel, ch, &cfg);
                 getyx(menu_win, y, x);
-                config_menu_select(menu_win, current_sel, &cfg);
+                config_menu_print_control(menu_win, current_sel, 1, &cfg);
                 wmove(menu_win, y, x);
             }
             break;
