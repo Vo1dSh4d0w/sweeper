@@ -7,7 +7,6 @@
 #include "color.h"
 #include "config.h"
 #include "input_handler.h"
-#include "macros.h"
 
 /**
  * struct config_info : an array of configuration definitions, configuration values and its count grouped together
@@ -187,12 +186,10 @@ static void config_menu_shift_input(WINDOW *window) {
 }
 
 static void config_menu_update_input(WINDOW *window, enum config_type cfg_type, union config_variant *value) {
-    int y, x;
+    int y;
     char input[44];
 
-    getyx(window, y, x);
-
-    discard(x);
+    y = getcury(window);
 
     config_menu_read_input(window, y - 3, 0, input);
     if (cfg_type == CFG_TYPE_NUMBER) {
