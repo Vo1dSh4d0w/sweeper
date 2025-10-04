@@ -54,16 +54,16 @@ int menu_open(const char *menu_title, size_t optc, const struct menu_option *opt
     while ((ch = wgetch(menu_win)) != '\n') {
         handle_kb_interrupt(ch);
         switch (ch) {
-            case KEY_UP:
-                current_sel = current_sel > 0 ? (current_sel - 1): optc - 1;
-                menu_reset(menu_win, menu_title, optc, optv);
-                menu_select(menu_win, optv, current_sel);
-                break;
-            case KEY_DOWN:
-                current_sel = (current_sel + 1) % optc;
-                menu_reset(menu_win, menu_title, optc, optv);
-                menu_select(menu_win, optv, current_sel);
-                break;
+        case KEY_UP:
+            current_sel = current_sel > 0 ? (current_sel - 1): optc - 1;
+            menu_reset(menu_win, menu_title, optc, optv);
+            menu_select(menu_win, optv, current_sel);
+            break;
+        case KEY_DOWN:
+            current_sel = (current_sel + 1) % optc;
+            menu_reset(menu_win, menu_title, optc, optv);
+            menu_select(menu_win, optv, current_sel);
+            break;
         }
     }
 

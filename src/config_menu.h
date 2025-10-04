@@ -9,6 +9,7 @@
 
 /**
  * config_menu_open : open the configuration window, this function will return when the user finishes configuring
+ *                    this will modify the given configuration in-place
  * @param menu_title : a title displayed on top of the configuration window
  * @param count      : the total count of configuration options
  * @param def        : array of configuration definitions (see config.h)
