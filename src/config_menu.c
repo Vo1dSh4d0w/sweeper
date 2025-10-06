@@ -136,7 +136,7 @@ static void config_menu_print_control(WINDOW *menu_win, int control, int select,
  */
 static size_t config_menu_read_input(WINDOW *window, const int index, const size_t offset, char *out) {
     int y, x;
-    chtype input[44];
+    chtype input[45];
     size_t length;
 
     // store the current position of the cursor so it can be restored later
@@ -317,7 +317,7 @@ static void config_menu_input(WINDOW *window, const int sel, const int ch, struc
     config_menu_read_input(window, sel, 0, input);
 
     // handle deleting
-    if (ch == KEY_BACKSPACE) {
+    if (isbackspace(ch)) {
         config_menu_handle_backspace(window);
     } else if (ch == KEY_DC) {
         config_menu_handle_del(window);
@@ -338,7 +338,7 @@ static void config_menu_input(WINDOW *window, const int sel, const int ch, struc
     wmove(window, y, x);
 
     // set cursor position
-    if (ch == KEY_BACKSPACE) {
+    if (isbackspace(ch)) {
         config_menu_move_cursor(window, sel, -1);
     } else if (ch != KEY_DC) {
         config_menu_move_cursor(window, sel, 1);
@@ -430,6 +430,8 @@ void config_menu_open(const char *menu_title, size_t count, const struct config_
             // if the characer is printable or backspace or DEL, handle it
             if (isprint(ch)) {
         case KEY_BACKSPACE:
+        case 0x7f:
+        case '\b':
         case KEY_DC:
                 config_menu_input(menu_win, current_sel, ch, &cfg);
             }
