@@ -26,8 +26,31 @@
           ];
         };
       };
+    package =
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in {
+        default = pkgs.stdenv.mkDerivation {
+          name = "sweeper";
+          src = ./.;
+          version = builtins.readFile ./version;
+          buildInputs = with pkgs; [
+            ncurses
+            pkg-config
+          ];
+
+          CFLAGS = "-Wall -Werror -O2";
+
+          installPhase = ''
+            mkdir -p $out/bin
+            cp out/sweeper $out/bin
+          '';
+        };
+      };
   in
   {
     devShells = forAllSystems devShell;
+    packages = forAllSystems package;
   };
 }

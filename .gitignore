@@ -3,3 +3,4 @@ out/
 .direnv/
 compile_commands.json
 .cache
+result/
