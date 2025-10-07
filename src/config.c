@@ -8,7 +8,7 @@ char *config_serialize(const size_t count, const struct config_def *def, const s
     char *serialized, buf[48];
     size_t i;
 
-    serialized = malloc(sizeof(char) * count * 48);
+    serialized = calloc(count * 48, sizeof(char));
 
     for (i = 0; i < count; i++) {
         strcat(serialized, def[i].id);
@@ -37,13 +37,13 @@ size_t config_deserialize(const size_t count, const struct config_def *def, stru
     char buffer[48];
 
     for (i = 0; i < count; i++) {
-        if (!sscanf(serialized, "%s%n", buffer, &n)) {
+        if (sscanf(serialized, "%[^=]%n", buffer, &n) == 0) {
             break;
         }
         serialized += n;
 
         for (j = 0; j < count; j++) {
-            if (strcmp(def[j].id, buffer)) {
+            if (strcmp(def[j].id, buffer) == 0) {
                 break;
             }
         }
@@ -54,11 +54,11 @@ size_t config_deserialize(const size_t count, const struct config_def *def, stru
             continue;
         }
 
-        strcpy(buffer, config[real_count].id);
+        strcpy(config[real_count].id, buffer);
 
         switch (def[j].type) {
         case CFG_TYPE_NUMBER:
-            sscanf(serialized, "=%lld%n", &config[real_count].value.number, &n);
+            sscanf(serialized, "=%lld\n%n", &config[real_count].value.number, &n);
             break;
         case CFG_TYPE_DECIMAL:
             break;
