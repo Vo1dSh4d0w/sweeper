@@ -10,6 +10,7 @@ OBJS=\
 src/color.o \
 src/config.o \
 src/config_menu.o \
+src/files.o \
 src/input_handler.o \
 src/main.o \
 src/menu.o \

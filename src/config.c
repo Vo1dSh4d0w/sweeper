@@ -1,6 +1,77 @@
 #include "config.h"
+#include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+char *config_serialize(const size_t count, const struct config_def *def, const struct config_val *config) {
+    char *serialized, buf[48];
+    size_t i;
+
+    serialized = malloc(sizeof(char) * count * 48);
+
+    for (i = 0; i < count; i++) {
+        strcat(serialized, def[i].id);
+        strcat(serialized, "=");
+        switch (def[i].type) {
+        case CFG_TYPE_NUMBER:
+            sprintf(buf, "%lld", config_get(count, config, def[i].id)->number);
+            break;
+        case CFG_TYPE_DECIMAL:
+            sprintf(buf, "%f", config_get(count, config, def[i].id)->decimal);
+            break;
+        case CFG_TYPE_FLAGS:
+            break;
+        }
+        strcat(serialized, buf);
+        strcat(serialized, "\n");
+    }
+    strcat(serialized, "\0");
+
+    return serialized;
+}
+
+size_t config_deserialize(const size_t count, const struct config_def *def, struct config_val *config, const char *serialized) {
+    size_t i, j, real_count = 0;
+    int n;
+    char buffer[48];
+
+    for (i = 0; i < count; i++) {
+        if (!sscanf(serialized, "%s%n", buffer, &n)) {
+            break;
+        }
+        serialized += n;
+
+        for (j = 0; j < count; j++) {
+            if (strcmp(def[j].id, buffer)) {
+                break;
+            }
+        }
+
+        if (j == count) {
+            sscanf(serialized, "%*[^\n]%n", &n);
+            serialized += n;
+            continue;
+        }
+
+        strcpy(buffer, config[real_count].id);
+
+        switch (def[j].type) {
+        case CFG_TYPE_NUMBER:
+            sscanf(serialized, "=%lld%n", &config[real_count].value.number, &n);
+            break;
+        case CFG_TYPE_DECIMAL:
+            break;
+        case CFG_TYPE_FLAGS:
+            break;
+        }
+
+        serialized += n;
+        real_count++;
+    }
+
+    return real_count;
+}
 
 const union config_variant *config_get(const size_t count, const struct config_val *config, const char id[16]) {
     int i;

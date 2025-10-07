@@ -1,7 +1,9 @@
 #include <ncurses.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include "color.h"
+#include "files.h"
 #include "menu.h"
 #include "main_menu.h"
 #include "config_menu.h"
@@ -12,6 +14,7 @@ struct config_val settings[2];
 
 int main() {
     enum main_menu_opts selection;
+    char *serialized_cfg;
 
     initscr();
     noecho();
@@ -36,6 +39,10 @@ int main() {
             break;
         case MM_SETTINGS:
             config_menu_open("Settings", 2, settings_def, settings);
+            serialized_cfg = config_serialize(2, settings_def, settings);
+            save_config_file("sweeper.conf", serialized_cfg);
+            free(serialized_cfg);
+
             clear();
             refresh();
             break;
