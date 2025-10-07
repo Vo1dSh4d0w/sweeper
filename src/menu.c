@@ -4,6 +4,7 @@
 #include "menu.h"
 #include "color.h"
 #include "input_handler.h"
+#include "win_helpers.h"
 
 static WINDOW *menu_create(int optc) {
     WINDOW *menu_win;
@@ -45,6 +46,8 @@ int menu_open(const char *menu_title, size_t optc, const struct menu_option *opt
     WINDOW *menu_win;
     int ch, current_sel = 0;
 
+reset:
+    require_terminal_size(optc + 5, 52);
     curs_set(0);
 
     menu_win = menu_create(optc);
@@ -53,7 +56,13 @@ int menu_open(const char *menu_title, size_t optc, const struct menu_option *opt
 
     while ((ch = wgetch(menu_win)) != '\n') {
         handle_kb_interrupt(ch);
+
         switch (ch) {
+        case KEY_RESIZE:
+            clear();
+            refresh();
+            delwin(menu_win);
+            goto reset;
         case KEY_UP:
             current_sel = current_sel > 0 ? (current_sel - 1): optc - 1;
             menu_reset(menu_win, menu_title, optc, optv);
