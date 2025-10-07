@@ -32,9 +32,9 @@
         pkgs = nixpkgs.legacyPackages.${system};
       in {
         default = pkgs.stdenv.mkDerivation {
-          name = "sweeper";
+          pname = "sweeper";
           src = ./.;
-          version = builtins.readFile ./version;
+          version = pkgs.lib.strings.trim (builtins.readFile ./version);
           buildInputs = with pkgs; [
             ncurses
             pkg-config
