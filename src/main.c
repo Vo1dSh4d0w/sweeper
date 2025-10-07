@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "color.h"
+#include "files.h"
 #include "menu.h"
 #include "main_menu.h"
 #include "config_menu.h"
@@ -12,6 +13,9 @@ struct config_val settings[2];
 
 int main() {
     enum main_menu_opts selection;
+    char *serialized_cfg;
+    struct config_val settings_from_file[2];
+    size_t settings_from_file_count;
 
     initscr();
     noecho();
@@ -22,6 +26,11 @@ int main() {
     refresh();
 
     config_merge(2, 2, settings_def, settings, settings_default);
+    serialized_cfg = read_config_file("sweeper.conf");
+    if (serialized_cfg != NULL) {
+        settings_from_file_count = config_deserialize(2, settings_def, settings_from_file, serialized_cfg);
+        config_merge(2, settings_from_file_count, settings_def, settings, settings_from_file);
+    }
 
     do {
         selection = menu_open("Main Menu", 4, main_menu);
@@ -36,6 +45,10 @@ int main() {
             break;
         case MM_SETTINGS:
             config_menu_open("Settings", 2, settings_def, settings);
+            serialized_cfg = config_serialize(2, settings_def, settings);
+            save_config_file("sweeper.conf", serialized_cfg);
+            free(serialized_cfg);
+
             clear();
             refresh();
             break;

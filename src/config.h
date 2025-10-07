@@ -43,7 +43,7 @@ struct config_val {
 /**
  * config_serialize : serialize an array of configuration values into a char array
  *                    the returned string will have a format of <id>=<value>, lines will be terminated with a single LF
- *                    and the char array will be terminated with a single EOF
+ *                    and the char array will be terminated with a single null character
  *
  * @param count  : the total count of configuration values
  * @param def    : array of configuration definitions
