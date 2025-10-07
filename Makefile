@@ -12,7 +12,8 @@ src/config.o \
 src/config_menu.o \
 src/input_handler.o \
 src/main.o \
-src/menu.o
+src/menu.o \
+src/win_helpers.o
 
 .SUFFIXES: .o .c
 

@@ -8,6 +8,7 @@
 #include "config.h"
 #include "input_handler.h"
 #include "macros.h"
+#include "win_helpers.h"
 
 /**
  * struct config_info : an array of configuration definitions, configuration values and its count grouped together
@@ -361,6 +362,10 @@ void config_menu_open(const char *menu_title, size_t count, const struct config_
     // make a working copy of the configuration
     memcpy(edited, config, sizeof(struct config_val) * count);
 
+    // ensure the terminal is always large enough
+reset:
+    require_terminal_size(count + 6, 96);
+
     // initialize window
     menu_win = config_menu_create(count);
     config_menu_reset(menu_win, menu_title, &cfg);
@@ -373,6 +378,11 @@ void config_menu_open(const char *menu_title, size_t count, const struct config_
         handle_kb_interrupt(ch);
 
         switch (ch) {
+        case KEY_RESIZE:
+            clear();
+            refresh();
+            delwin(menu_win);
+            goto reset;
         case KEY_UP:
             // change selection
             config_menu_print_control(menu_win, current_sel, 0, &cfg);
