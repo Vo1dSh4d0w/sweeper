@@ -11,11 +11,19 @@ const struct config_def settings_def[] = {
         .type = CFG_TYPE_NUMBER,
         .id = SETTINGS_WIDTH,
         .label = "Width",
+        .spec.number = {
+            .min = 5,
+            .max = 150
+        }
     },
     {
         .type = CFG_TYPE_NUMBER,
         .id = SETTINGS_HEIGHT,
-        .label = "Height"
+        .label = "Height",
+        .spec.number = {
+            .min = 5,
+            .max = 50
+        }
     }
 };
 
