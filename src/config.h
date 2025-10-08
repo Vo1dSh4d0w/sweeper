@@ -14,6 +14,13 @@ union config_variant {
     int flags;                      // use if type equals CFG_TYPE_FLAGS
 };
 
+union config_spec {
+    struct {
+        int min;
+        int max;
+    } number;
+};
+
 /**
  * enum config_type : determines which union member of config_variant to use
  */
@@ -30,6 +37,7 @@ struct config_def {
     enum config_type type;          // the type of the configuration value
     char id[16];                    // the id of the configuration parameter, is used in serialization/deserialization, must be unique
     char label[48];                 // the user-friendly display label used to describe the configuration parameter
+    union config_spec spec;
 };
 
 /**

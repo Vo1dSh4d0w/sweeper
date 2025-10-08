@@ -274,6 +274,30 @@ static void config_menu_update_input(WINDOW *window, enum config_type cfg_type, 
 }
 
 /**
+ * config_menu_validate_spec : validate the spec attached to a config def on a config value
+ * @param index : the index of the config to validate
+ * @param cfg : the configuration information
+ */
+static void config_menu_validate_spec(const int index, struct config_info *cfg) {
+    const union config_variant *value;
+    union config_variant new_value;
+
+    value = config_get(cfg->count, cfg->val, cfg->def[index].id);
+    memcpy(&new_value, value, sizeof(union config_variant));
+
+    switch (cfg->def[index].type) {
+        case CFG_TYPE_NUMBER:
+        new_value.number = min(max(value->number, cfg->def[index].spec.number.min), cfg->def[index].spec.number.max);
+        break;
+        case CFG_TYPE_DECIMAL:
+        break;
+        case CFG_TYPE_FLAGS:
+        break;
+    }
+    config_set(cfg->count, cfg->val, cfg->def[index].id, new_value);
+}
+
+/**
  * config_menu_move_cursor : move the cursor inside a control by a given offset;
  *                           this function will ensure the cursor ends in a valid position
  * @param window : the window to move the cursor on
@@ -384,12 +408,18 @@ reset:
             delwin(menu_win);
             goto reset;
         case KEY_UP:
+            if (current_sel < count) {
+                config_menu_validate_spec(current_sel, &cfg);
+            }
             // change selection
             config_menu_print_control(menu_win, current_sel, 0, &cfg);
             current_sel = current_sel > 0 ? (current_sel - 1): count + 1;
             config_menu_print_control(menu_win, current_sel, 1, &cfg);
             break;
         case KEY_DOWN:
+            if (current_sel < count) {
+                config_menu_validate_spec(current_sel, &cfg);
+            }
             // change selection
             config_menu_print_control(menu_win, current_sel, 0, &cfg);
             current_sel = (current_sel + 1) % (count + 2);
