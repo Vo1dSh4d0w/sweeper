@@ -1,5 +1,6 @@
 #include <ncurses.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -8,6 +9,7 @@
 #include "config.h"
 #include "input_handler.h"
 #include "macros.h"
+#include "status_bar.h"
 #include "win_helpers.h"
 
 /**
@@ -281,6 +283,7 @@ static void config_menu_update_input(WINDOW *window, enum config_type cfg_type, 
 static void config_menu_validate_spec(const int index, struct config_info *cfg) {
     const union config_variant *value;
     union config_variant new_value;
+    char status_bar_msg[128];
 
     value = config_get(cfg->count, cfg->val, cfg->def[index].id);
     memcpy(&new_value, value, sizeof(union config_variant));
@@ -288,6 +291,10 @@ static void config_menu_validate_spec(const int index, struct config_info *cfg) 
     switch (cfg->def[index].type) {
         case CFG_TYPE_NUMBER:
         new_value.number = min(max(value->number, cfg->def[index].spec.number.min), cfg->def[index].spec.number.max);
+        if (new_value.number != value->number) {
+            sprintf(status_bar_msg, "Invalid value for %s was updated. Changed from %lld to %lld.", cfg->def[index].label, value->number, new_value.number);
+            status_bar_message(status_bar_msg);
+        }
         break;
         case CFG_TYPE_DECIMAL:
         break;
@@ -459,10 +466,12 @@ reset:
             if (current_sel == count) {
                 // if user pressed <OK>, make the working copy the actual value
                 config_merge(count, count, def, config, edited);
+                status_bar_message("Config saved.");
                 goto exit;
             }
             if (current_sel == count + 1) {
                 // if the user pressed <Cancel>, don't make the working copy the actual value
+                status_bar_message("Changes discarded.");
                 goto exit;
             }
             break;
