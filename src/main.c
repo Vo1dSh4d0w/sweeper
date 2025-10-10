@@ -3,17 +3,19 @@
 #include <stdlib.h>
 #include "color.h"
 #include "files.h"
+#include "macros.h"
 #include "menu.h"
 #include "main_menu.h"
 #include "config_menu.h"
 #include "settings.h"
 #include "config.h"
+#include "status_bar.h"
 
 struct config_val settings[2];
 
 int main() {
     enum main_menu_opts selection;
-    char *serialized_cfg;
+    char *serialized_cfg, status_bar_msg[64];
     struct config_val settings_from_file[2];
     size_t settings_from_file_count;
 
@@ -25,11 +27,20 @@ int main() {
     set_escdelay(25);
     refresh();
 
+    status_bar_enable();
+#ifdef SWEEPER_VERSION
+    sprintf(status_bar_msg, "Sweeper %s", SWEEPER_VERSION);
+    status_bar_message(status_bar_msg);
+#else
+    discard(status_bar_msg);
+#endif
+
     config_merge(2, 2, settings_def, settings, settings_default);
     serialized_cfg = read_config_file("sweeper.conf");
     if (serialized_cfg != NULL) {
         settings_from_file_count = config_deserialize(2, settings_def, settings_from_file, serialized_cfg);
         config_merge(2, settings_from_file_count, settings_def, settings, settings_from_file);
+        free(serialized_cfg);
     }
 
     do {
