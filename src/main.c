@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "color.h"
 #include "files.h"
+#include "game.h"
 #include "macros.h"
 #include "menu.h"
 #include "main_menu.h"
@@ -10,8 +11,6 @@
 #include "settings.h"
 #include "config.h"
 #include "status_bar.h"
-
-struct config_val settings[2];
 
 int main() {
     enum main_menu_opts selection;
@@ -50,6 +49,8 @@ int main() {
 
         switch (selection) {
         case MM_START:
+            game_start();
+            break;
         case MM_STATS:
             printw("Selected %d", selection);
             refresh();

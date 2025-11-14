@@ -12,9 +12,14 @@ src/color.o \
 src/config.o \
 src/config_menu.o \
 src/files.o \
+src/game.o \
+src/game_main_win.o \
+src/game_status_win.o \
+src/game_wm.o \
 src/input_handler.o \
 src/main.o \
 src/menu.o \
+src/settings.o \
 src/status_bar.o \
 src/win_helpers.o
 

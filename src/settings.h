@@ -6,38 +6,15 @@
 #define SETTINGS_WIDTH "WIDTH"
 #define SETTINGS_HEIGHT "HEIGHT"
 
-const struct config_def settings_def[] = {
-    {
-        .type = CFG_TYPE_NUMBER,
-        .id = SETTINGS_WIDTH,
-        .label = "Width",
-        .spec.number = {
-            .min = 5,
-            .max = 150
-        }
-    },
-    {
-        .type = CFG_TYPE_NUMBER,
-        .id = SETTINGS_HEIGHT,
-        .label = "Height",
-        .spec.number = {
-            .min = 5,
-            .max = 50
-        }
-    }
-};
+#define SETTINGS_LENGTH 2
 
-const struct config_val settings_default[] = {
-  {
-      .id = SETTINGS_WIDTH,
-      .value.number = 10
-  },
-  {
-      .id = SETTINGS_HEIGHT,
-      .value.number = 10
-  }
-};
+#define SETTINGS_WIDTH_V (config_get(SETTINGS_LENGTH, settings, SETTINGS_WIDTH)->number)
+#define SETTINGS_HEIGHT_V (config_get(SETTINGS_LENGTH, settings, SETTINGS_HEIGHT)->number)
 
-extern struct config_val settings[2];
+extern const struct config_def settings_def[];
+
+extern const struct config_val settings_default[];
+
+extern struct config_val settings[SETTINGS_LENGTH];
 
 #endif
