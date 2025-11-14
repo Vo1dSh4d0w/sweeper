@@ -293,7 +293,7 @@ static void config_menu_validate_spec(const int index, struct config_info *cfg) 
         new_value.number = min(max(value->number, cfg->def[index].spec.number.min), cfg->def[index].spec.number.max);
         if (new_value.number != value->number) {
             sprintf(status_bar_msg, "Invalid value for %s was updated. Changed from %lld to %lld.", cfg->def[index].label, value->number, new_value.number);
-            status_bar_message(status_bar_msg);
+            status_bar_message(status_bar_msg, sbmp_left);
         }
         break;
         case CFG_TYPE_DECIMAL:
@@ -466,12 +466,12 @@ reset:
             if (current_sel == count) {
                 // if user pressed <OK>, make the working copy the actual value
                 config_merge(count, count, def, config, edited);
-                status_bar_message("Config saved.");
+                status_bar_message("Config saved.", sbmp_left);
                 goto exit;
             }
             if (current_sel == count + 1) {
                 // if the user pressed <Cancel>, don't make the working copy the actual value
-                status_bar_message("Changes discarded.");
+                status_bar_message("Changes discarded.", sbmp_left);
                 goto exit;
             }
             break;

@@ -30,7 +30,7 @@ int main() {
     status_bar_enable();
 #ifdef SWEEPER_VERSION
     sprintf(status_bar_msg, "Sweeper %s", SWEEPER_VERSION);
-    status_bar_message(status_bar_msg);
+    status_bar_message(status_bar_msg, sbmp_right);
 #else
     discard(status_bar_msg);
 #endif
