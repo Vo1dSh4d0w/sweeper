@@ -6,10 +6,16 @@
 static WINDOW *status_bar;
 static int status_bar_enabled = 0;
 static char message[1024] = "";
+static char message_right[1024] = "";
 
 static void status_bar_print(char *msg) {
     status_bar_clear();
     mvwprintw(status_bar, 0, 0, "%s", msg);
+    wrefresh(status_bar);
+}
+
+static void status_bar_print_right(char *msg) {
+    mvwprintw(status_bar, 0, COLS - strlen(msg), "%s", msg);
     wrefresh(status_bar);
 }
 
@@ -46,10 +52,16 @@ void status_bar_clear() {
     }
 }
 
-void status_bar_message(char *msg) {
-    strcpy(message, msg);
+void status_bar_message(char *msg, enum status_bar_message_position pos) {
+    if (pos == sbmp_left) {
+        strcpy(message, msg);
+    }
+    if (pos == sbmp_right) {
+        strcpy(message_right, msg);
+    }
     if (status_bar_enabled) {
-        status_bar_print(msg);
+        status_bar_print(message);
+        status_bar_print_right(message_right);
     }
 }
 
@@ -65,5 +77,6 @@ void status_bar_handle_resize() {
         status_bar_disable();
         status_bar_enable();
         status_bar_print(message);
+        status_bar_print_right(message_right);
     }
 }
